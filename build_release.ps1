@@ -34,12 +34,18 @@ if (Test-Path -LiteralPath $Stage) { Remove-Item -LiteralPath $Stage -Recurse -F
 New-Item -ItemType Directory -Path $Stage | Out-Null
 Copy-Item -Path (Join-Path $SourceBundle '*') -Destination $Stage -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $ProjectRoot 'README.md') -Destination $Stage
+Copy-Item -LiteralPath (Join-Path $ProjectRoot 'README_EN.md') -Destination $Stage
 Copy-Item -LiteralPath (Join-Path $ProjectRoot 'THIRD_PARTY_NOTICES.md') -Destination $Stage
 Copy-Item -LiteralPath (Join-Path $ProjectRoot 'licenses') -Destination (Join-Path $Stage 'licenses') -Recurse
 
 if (Test-Path -LiteralPath $Archive) { Remove-Item -LiteralPath $Archive -Force }
-Compress-Archive -Path (Join-Path $Stage '*') -DestinationPath $Archive -CompressionLevel Optimal
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[IO.Compression.ZipFile]::CreateFromDirectory($Stage, $Archive, [IO.Compression.CompressionLevel]::Optimal, $false)
 & $ISCC "/DAppVersion=$Version" "/DPackageDir=$Stage" (Join-Path $ProjectRoot 'installer\QQmusicX.iss')
 if ($LASTEXITCODE -ne 0) { throw 'Inno Setup failed.' }
 
-Get-Item -LiteralPath $Archive, $Installer | Select-Object FullName, Length
+$ChecksumFile = Join-Path $ReleaseRoot 'SHA256SUMS.txt'
+Get-FileHash -LiteralPath $Archive, $Installer -Algorithm SHA256 |
+    ForEach-Object { '{0}  {1}' -f $_.Hash, [IO.Path]::GetFileName($_.Path) } |
+    Set-Content -LiteralPath $ChecksumFile -Encoding ascii
+Get-Item -LiteralPath $Archive, $Installer, $ChecksumFile | Select-Object FullName, Length
