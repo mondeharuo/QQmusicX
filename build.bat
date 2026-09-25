@@ -1,0 +1,13 @@
+@echo off
+setlocal
+chcp 65001 >nul
+set "PYTHONUTF8=1"
+cd /d "%~dp0."
+"%~dp0.venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onedir --windowed --name QQmusicX --specpath "%~dp0." --distpath "%~dp0dist" --workpath "%~dp0build" "%~dp0main.py"
+if errorlevel 1 (
+  echo Build failed. Review the output above.
+  pause
+  exit /b 1
+)
+echo Build complete: %~dp0dist\QQmusicX\QQmusicX.exe
+pause

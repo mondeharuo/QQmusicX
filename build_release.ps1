@@ -1,0 +1,45 @@
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+
+$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$Version = '0.1.0'
+$ReleaseRoot = Join-Path $ProjectRoot 'release'
+$PyDistRoot = Join-Path $ReleaseRoot '_pyinstaller-dist'
+$WorkRoot = Join-Path $ReleaseRoot '_pyinstaller-build'
+$PackageName = "QQmusicX-windows-x64-v$Version"
+$Stage = Join-Path $ReleaseRoot $PackageName
+$Archive = Join-Path $ReleaseRoot "$PackageName.zip"
+$Installer = Join-Path $ReleaseRoot "QQmusicX-Setup-x64-v$Version.exe"
+$Python = Join-Path $ProjectRoot '.venv\Scripts\python.exe'
+$ISCC = Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 6\ISCC.exe'
+
+if (-not (Test-Path -LiteralPath $Python)) { throw "Build Python not found: $Python" }
+if (-not (Test-Path -LiteralPath $ISCC)) { throw "Inno Setup compiler not found: $ISCC" }
+$bits = & $Python -c "import struct; print(struct.calcsize('P') * 8)"
+if ($LASTEXITCODE -ne 0 -or $bits.Trim() -ne '64') { throw 'A 64-bit Python environment is required to build the x64 release.' }
+
+New-Item -ItemType Directory -Force -Path $ReleaseRoot | Out-Null
+& $Python -m PyInstaller --noconfirm --clean --onedir --windowed --name QQmusicX `
+    --specpath $ProjectRoot --distpath $PyDistRoot --workpath $WorkRoot `
+    (Join-Path $ProjectRoot 'main.py')
+if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
+
+$SourceBundle = Join-Path $PyDistRoot 'QQmusicX'
+if (-not (Test-Path -LiteralPath (Join-Path $SourceBundle 'QQmusicX.exe'))) { throw 'PyInstaller output is incomplete.' }
+
+$releasePrefix = [IO.Path]::GetFullPath($ReleaseRoot).TrimEnd('\') + '\'
+$resolvedStage = [IO.Path]::GetFullPath($Stage)
+if (-not $resolvedStage.StartsWith($releasePrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Refusing to replace a staging folder outside release/.' }
+if (Test-Path -LiteralPath $Stage) { Remove-Item -LiteralPath $Stage -Recurse -Force }
+New-Item -ItemType Directory -Path $Stage | Out-Null
+Copy-Item -Path (Join-Path $SourceBundle '*') -Destination $Stage -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $ProjectRoot 'README.md') -Destination $Stage
+Copy-Item -LiteralPath (Join-Path $ProjectRoot 'THIRD_PARTY_NOTICES.md') -Destination $Stage
+Copy-Item -LiteralPath (Join-Path $ProjectRoot 'licenses') -Destination (Join-Path $Stage 'licenses') -Recurse
+
+if (Test-Path -LiteralPath $Archive) { Remove-Item -LiteralPath $Archive -Force }
+Compress-Archive -Path (Join-Path $Stage '*') -DestinationPath $Archive -CompressionLevel Optimal
+& $ISCC "/DAppVersion=$Version" "/DPackageDir=$Stage" (Join-Path $ProjectRoot 'installer\QQmusicX.iss')
+if ($LASTEXITCODE -ne 0) { throw 'Inno Setup failed.' }
+
+Get-Item -LiteralPath $Archive, $Installer | Select-Object FullName, Length

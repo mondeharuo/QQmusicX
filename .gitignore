@@ -1,0 +1,26 @@
+# Local environments and generated build files
+.venv/
+__pycache__/
+*.py[cod]
+build/
+build-*/
+dist/
+dist-*/
+release/
+*.spec
+build_latest.log
+
+# User data and diagnostics
+data/
+logs/
+*.db
+*.db-shm
+*.db-wal
+*.log
+tests/integration_smoke.py
+
+# Editor and OS files
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini
