@@ -11,6 +11,7 @@ $Stage = Join-Path $ReleaseRoot $PackageName
 $Archive = Join-Path $ReleaseRoot "$PackageName.zip"
 $Installer = Join-Path $ReleaseRoot "QQmusicX-Setup-x64-v$Version.exe"
 $Python = Join-Path $ProjectRoot '.venv\Scripts\python.exe'
+$AppIcon = Join-Path $ProjectRoot 'docs\assets\qqmusicx-icon.ico'
 $ISCC = Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 6\ISCC.exe'
 
 if (-not (Test-Path -LiteralPath $Python)) { throw "Build Python not found: $Python" }
@@ -20,6 +21,7 @@ if ($LASTEXITCODE -ne 0 -or $bits.Trim() -ne '64') { throw 'A 64-bit Python envi
 
 New-Item -ItemType Directory -Force -Path $ReleaseRoot | Out-Null
 & $Python -m PyInstaller --noconfirm --clean --onedir --windowed --name QQmusicX `
+    --icon $AppIcon --add-data "${AppIcon};assets" `
     --specpath $ProjectRoot --distpath $PyDistRoot --workpath $WorkRoot `
     (Join-Path $ProjectRoot 'main.py')
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed.' }
@@ -37,6 +39,7 @@ Copy-Item -LiteralPath (Join-Path $ProjectRoot 'README.md') -Destination $Stage
 Copy-Item -LiteralPath (Join-Path $ProjectRoot 'README_EN.md') -Destination $Stage
 Copy-Item -LiteralPath (Join-Path $ProjectRoot 'THIRD_PARTY_NOTICES.md') -Destination $Stage
 Copy-Item -LiteralPath (Join-Path $ProjectRoot 'licenses') -Destination (Join-Path $Stage 'licenses') -Recurse
+Copy-Item -LiteralPath (Join-Path $ProjectRoot 'docs') -Destination (Join-Path $Stage 'docs') -Recurse
 
 if (Test-Path -LiteralPath $Archive) { Remove-Item -LiteralPath $Archive -Force }
 Add-Type -AssemblyName System.IO.Compression.FileSystem

@@ -23,6 +23,7 @@ if getattr(sys, "frozen", False) and hasattr(os, "add_dll_directory"):
         if library.is_file():
             _loaded_qt_libraries.append(ctypes.WinDLL(str(library), winmode=0x00001100))
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from ui.main_window import MainWindow
@@ -34,7 +35,15 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName("QQmusicX")
     app.setOrganizationName("QQmusicX")
+    if getattr(sys, "frozen", False):
+        icon_path = Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent)) / "assets" / "qqmusicx-icon.ico"
+    else:
+        icon_path = Path(__file__).resolve().parent / "docs" / "assets" / "qqmusicx-icon.ico"
+    if icon_path.is_file():
+        app.setWindowIcon(QIcon(str(icon_path)))
     window = MainWindow()
+    if icon_path.is_file():
+        window.setWindowIcon(QIcon(str(icon_path)))
     if "--smoke-test" in sys.argv:
         print("QQmusicX UI initialized")
         return 0

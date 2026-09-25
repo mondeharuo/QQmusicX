@@ -1,8 +1,14 @@
-# QQmusicX
+<p align="center"><img src="docs/assets/qqmusicx-icon.png" alt="QQmusicX 软件图标" width="144"></p>
 
-**Windows x64 本地音乐批处理工具**，提供图形界面递归扫描目录，并调用用户本机单独安装的 `qmdec` 命令行程序处理文件。
+<h1 align="center">QQmusicX</h1>
 
-[English](README_EN.md)
+<p align="center"><strong>Windows x64 本地音乐批处理工具</strong></p>
+
+<p align="center"><a href="README_EN.md">English</a></p>
+
+<p align="center"><img src="docs/assets/qqmusicx-main.png" alt="QQmusicX 主界面截图" width="100%"></p>
+
+QQmusicX 提供图形界面递归扫描目录，并调用用户本机单独安装的 `qmdec` 命令行程序处理文件。
 
 ## 下载
 

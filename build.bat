@@ -3,7 +3,7 @@ setlocal
 chcp 65001 >nul
 set "PYTHONUTF8=1"
 cd /d "%~dp0."
-"%~dp0.venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onedir --windowed --name QQmusicX --specpath "%~dp0." --distpath "%~dp0dist" --workpath "%~dp0build" "%~dp0main.py"
+"%~dp0.venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onedir --windowed --name QQmusicX --icon "%~dp0docs\assets\qqmusicx-icon.ico" --add-data "%~dp0docs\assets\qqmusicx-icon.ico;assets" --specpath "%~dp0." --distpath "%~dp0dist" --workpath "%~dp0build" "%~dp0main.py"
 if errorlevel 1 (
   echo Build failed. Review the output above.
   pause

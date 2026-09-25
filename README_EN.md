@@ -1,6 +1,14 @@
-# QQmusicX
+<p align="center"><img src="docs/assets/qqmusicx-icon.png" alt="QQmusicX application icon" width="144"></p>
 
-**Windows x64 desktop interface for organizing and batch-processing local QQ Music files with the separately installed `qmdec` command-line tool.**
+<h1 align="center">QQmusicX</h1>
+
+<p align="center"><strong>Windows x64 local music batch processor</strong></p>
+
+<p align="center"><a href="README.md">中文说明</a></p>
+
+<p align="center"><img src="docs/assets/qqmusicx-main.png" alt="QQmusicX main window screenshot" width="100%"></p>
+
+**A Windows x64 desktop interface for organizing and batch-processing local QQ Music files with the separately installed `qmdec` command-line tool.**
 
 QQmusicX recursively scans a source tree, preserves relative folders and filenames, copies matching LRC files byte-for-byte, validates output audio with `ffprobe`, and tracks work in SQLite so completed items can be skipped on later runs. Source files are treated as read-only.
 

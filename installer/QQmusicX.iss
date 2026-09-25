@@ -18,6 +18,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\release
 OutputBaseFilename=QQmusicX-Setup-x64-v{#AppVersion}
+SetupIconFile={#PackageDir}\docs\assets\qqmusicx-icon.ico
 UninstallDisplayIcon={app}\QQmusicX.exe
 WizardStyle=modern
 Compression=lzma2/ultra64
